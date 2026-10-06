@@ -2,7 +2,7 @@
 
 **Structure-first public-remark extraction** from long, heterogeneous city-council transcripts.
 
-AgendaIndex first recovers a TOC-like agenda tree over a diarized meeting, then runs localized remark inference only inside public-participation windows (Public Comment / Public Hearing and city-specific aliases). This repository contains the **core inference components** used for section extraction, within-window classification, and city-year batch runs.
+AgendaIndex first recovers a TOC-like agenda tree over a diarized meeting, then runs localized remark inference only inside public-participation windows (Public Comment / Public Hearing and city-specific aliases). This repository contains the **core inference components** used for section extraction, within-window classification, and city-year batch runs. Parts of the code were adopted from: https://github.com/VectifyAI/PageIndex
 
 > Paper / talk: *AgendaIndex: Structure-First Public-Remark Extraction* (IC2S2 2026).
 
