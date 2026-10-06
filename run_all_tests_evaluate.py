@@ -14,7 +14,7 @@ RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results"
 def _indices_in_stage(stages: list, stage_name: str) -> list:
     """Indices across ALL stages matching stage_name (repeated/aliased public windows)."""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from pageindex.section_taxonomy import indices_for_section
+    from agendaindex.section_taxonomy import indices_for_section
 
     return indices_for_section(stages, stage_name)
 
@@ -53,7 +53,7 @@ def run_one(meeting_path: str, results_dir: str, model: str, skip_structure: boo
     base = os.path.splitext(os.path.basename(meeting_path))[0]
     structure_path = os.path.join(results_dir, f"{base}_meeting_structure.json")
 
-    from pageindex.meeting_structure import extract_public_comment_by_section, classify_utterance_public_comment
+    from agendaindex.meeting_structure import extract_public_comment_by_section, classify_utterance_public_comment
 
     if not skip_structure:
         try:

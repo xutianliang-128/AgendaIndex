@@ -27,7 +27,7 @@ SPLITS = ROOT / "data" / "all_splits_localgov_train_test_val" / "all_splits"
 STRUCT_CACHE = ROOT / "results" / "all_splits_pred_cache" / "structures"
 
 sys.path.insert(0, str(ROOT))
-from pageindex.section_taxonomy import public_section_indices  # noqa: E402
+from agendaindex.section_taxonomy import public_section_indices  # noqa: E402
 
 # GPT-5 family rejects temperature != 1 on chat.completions and bills hidden
 # reasoning tokens, so it needs different kwargs than the 4.x models.

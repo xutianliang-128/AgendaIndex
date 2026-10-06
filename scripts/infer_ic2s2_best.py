@@ -2,7 +2,7 @@
 """Run the winning configuration over the seven IC2S2 cities and score PC / PH.
 
 Winning configuration, as measured by scripts/ab_context_strategies.py:
-  stage 1  cached section windows from pageindex.section_taxonomy
+  stage 1  cached section windows from agendaindex.section_taxonomy
   stage 2  strategy C, per-line output format, chunk 100, +/-5 context lines,
            v2 rules, gpt-4.1-mini
 
@@ -30,7 +30,7 @@ SPLITS = ROOT / "data" / "all_splits_localgov_train_test_val" / "all_splits"
 STRUCT_CACHE = ROOT / "results" / "all_splits_pred_cache" / "structures"
 
 sys.path.insert(0, str(ROOT))
-from pageindex.section_taxonomy import classify_stage, public_section_indices  # noqa: E402
+from agendaindex.section_taxonomy import classify_stage, public_section_indices  # noqa: E402
 
 CITIES = ["SEA", "OAK", "RCH", "AA", "LS", "RO", "JS", "AP", "PE", "IN"]
 CITY_NAMES = {
@@ -310,7 +310,7 @@ def main() -> None:
         missing = [mk for mk in meetings if mk not in structs]
         if missing and not args.skip_structure:
             print(f"[{city}] extracting structure for {len(missing)} meeting(s)...", flush=True)
-            from pageindex.meeting_structure import extract_meeting_structure
+            from agendaindex.meeting_structure import extract_meeting_structure
             new = extract_meeting_structure(
                 meeting_data={mk: meetings[mk] for mk in missing},
                 model=args.structure_model,

@@ -1,7 +1,7 @@
 """
 Optional official minutes (agenda summary / clerk notes) as *global context* for LLM prompts.
 
-Design (aligned with pageindex-style pipelines):
+Design (aligned with AgendaIndex-style pipelines):
 - Transcript utterances remain the authoritative source for start_index/end_index.
 - Minutes are hints only: agenda order, section titles, rough timing—may disagree with ASR.
 

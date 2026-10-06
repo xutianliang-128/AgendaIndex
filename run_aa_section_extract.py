@@ -33,7 +33,7 @@ def main():
     os.makedirs(args.results_dir, exist_ok=True)
     base = os.path.splitext(os.path.basename(args.meeting_path))[0]
 
-    from pageindex.meeting_structure import extract_public_comment_by_section
+    from agendaindex.meeting_structure import extract_public_comment_by_section
 
     print("Step 1: Extracting meeting structure (sections)...")
     structure, meeting_with_labels, public_comment_extract = extract_public_comment_by_section(

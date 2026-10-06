@@ -24,7 +24,7 @@ if __name__ == "__main__":
     os.makedirs(output_dir, exist_ok=True)
 
     if args.task == "structure":
-        from pageindex.meeting_structure import extract_meeting_structure
+        from agendaindex.meeting_structure import extract_meeting_structure
         output_path = args.output or os.path.join(output_dir, f"{base}_meeting_structure.json")
         print("Extracting meeting structure (Roll Call, Presentation, Public Comment, etc.)...")
         result = extract_meeting_structure(meeting_path=args.meeting_path, model=args.model)
@@ -34,7 +34,7 @@ if __name__ == "__main__":
             print(f"  {date}: {len(stages)} stages -> {[s.get('stage_name') for s in stages]}")
         print(f"Done. Saved to: {output_path}")
     else:
-        from pageindex.extract_public_comment import extract_public_comment
+        from agendaindex.extract_public_comment import extract_public_comment
         output_path = args.output or os.path.join(output_dir, f"{base}_public_comment.json")
         print("Extracting public comments...")
         result = extract_public_comment(

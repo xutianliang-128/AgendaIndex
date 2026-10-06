@@ -20,7 +20,7 @@ def _default_structure_path(meeting_path: str) -> str:
 def _indices_in_stage(stages: list, stage_name: str) -> list:
     """Indices across ALL stages matching stage_name (repeated/aliased public windows)."""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from pageindex.section_taxonomy import indices_for_section
+    from agendaindex.section_taxonomy import indices_for_section
 
     return indices_for_section(stages, stage_name)
 
@@ -71,7 +71,7 @@ def main():
     with open(structure_path, "r", encoding="utf-8") as f:
         structure = json.load(f)
 
-    from pageindex.meeting_structure import classify_utterance_public_comment
+    from agendaindex.meeting_structure import classify_utterance_public_comment
 
     all_results = []
     y_true = []

@@ -1,7 +1,7 @@
 # Public Comment / Public Hearing 的城市叫法对照
 
 来源：`results/*_meeting_structure.json` 里 LLM 实际产出的 stage 名，
-按 `pageindex/section_taxonomy.py` 的判定归类。括号内为出现次数。
+按 `agendaindex/section_taxonomy.py` 的判定归类。括号内为出现次数。
 
 覆盖 59 个城市 / 7084 场会议。
 

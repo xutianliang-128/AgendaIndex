@@ -41,7 +41,7 @@ Recommended classification setup from our bake-off (see `scripts/ab_context_stra
 | Output | per-line `index: 0/1` (chunk size 100) |
 | Window typing | `auto` — content-based PC/PH typing only for cities that split public comment by agenda scope (e.g. Lansing) |
 
-Production entry points still expose the simpler per-utterance classifier in `pageindex/meeting_structure.py`; the batch strategy lives in `scripts/infer_ic2s2_best.py` / `scripts/ab_context_strategies.py`.
+Production entry points still expose the simpler per-utterance classifier in `agendaindex/meeting_structure.py`; the batch strategy lives in `scripts/infer_ic2s2_best.py` / `scripts/ab_context_strategies.py`.
 
 ---
 
@@ -49,7 +49,7 @@ Production entry points still expose the simpler per-utterance classifier in `pa
 
 ```
 AgendaIndex/
-├── pageindex/                      # Core library
+├── agendaindex/                      # Core library
 │   ├── meeting_structure.py        # Stage extraction + within-section classify
 │   ├── section_taxonomy.py         # PC/PH aliases, excludes, multi-window indices
 │   ├── transcript_loader.py        # Meeting JSON / WhisperX loaders
@@ -58,7 +58,7 @@ AgendaIndex/
 │   ├── utils.py / llm_backend.py   # OpenAI / local Qwen routing
 │   ├── extract_public_comment.py   # Alternate direct / tree extract path
 │   └── page_index.py               # Legacy tree utilities (PDF-oriented)
-├── run_pageindex.py                # Single-meeting CLI (structure or labels)
+├── run_agendaindex.py                # Single-meeting CLI (structure or labels)
 ├── run_rag_by_fibs.py              # City-year batch over localgov tree
 ├── run_aa_section_extract.py       # Structure extract helper
 ├── run_aa_classify_within_section.py
@@ -70,7 +70,6 @@ AgendaIndex/
 │   ├── ab_classifier_models.py     # Model × prompt A/B
 │   ├── run_year_all_cities.py      # Resumable multi-city year driver
 │   └── export_inferred_pc_ph.py    # Export predicted PC/PH utterances
-├── examples/AP_08_07_23.json       # Tiny one-meeting example
 ├── docs/section_name_by_city.md    # Observed PC/PH stage-name aliases
 └── requirements.txt
 ```
@@ -109,18 +108,18 @@ Meeting JSON shape: `{ "MEETING_KEY": [ {speaker, text, start, end, ...}, ... ] 
 export CHATGPT_API_KEY=sk-...
 export LLM_BACKEND=openai
 
-python run_pageindex.py \
-  --meeting_path examples/AP_08_07_23.json \
+python run_agendaindex.py \
+  --meeting_path /path/to/meeting.json \
   --task structure \
   --model gpt-4o-2024-11-20
-# → results/AP_08_07_23_meeting_structure.json
+# → results/<basename>_meeting_structure.json
 ```
 
 ### 2. Classify public remarks (simple path)
 
 ```bash
-python run_pageindex.py \
-  --meeting_path examples/AP_08_07_23.json \
+python run_agendaindex.py \
+  --meeting_path /path/to/meeting.json \
   --task public_comment \
   --extract_mode direct \
   --model gpt-4o-2024-11-20
@@ -130,12 +129,12 @@ Or structure → within-section classify:
 
 ```bash
 python run_aa_section_extract.py \
-  --meeting_path examples/AP_08_07_23.json \
+  --meeting_path /path/to/meeting.json \
   --results_dir results
 
 python run_aa_classify_within_section.py \
-  --meeting_path examples/AP_08_07_23.json \
-  --structure_path results/AP_08_07_23_meeting_structure.json
+  --meeting_path /path/to/meeting.json \
+  --structure_path results/<basename>_meeting_structure.json
 ```
 
 ### 3. City-year batch (localgov layout)
@@ -159,7 +158,7 @@ python run_rag_by_fibs.py \
 
 ## Section taxonomy
 
-`pageindex/section_taxonomy.py` is the single source of truth for which stage names count as Public Comment vs Public Hearing. It:
+`agendaindex/section_taxonomy.py` is the single source of truth for which stage names count as Public Comment vs Public Hearing. It:
 
 - matches **all** windows in a meeting (not only the first hit);
 - covers aliases such as *Public Participation*, *Citizens Communication*, *Call to the Public*, *Reserved / General / Extended Time*;

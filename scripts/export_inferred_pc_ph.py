@@ -58,7 +58,7 @@ CROSSWALK = ROOT / "exports" / "fips_city_crosswalk.csv"
 
 
 sys.path.insert(0, str(ROOT))
-from pageindex.section_taxonomy import public_section_indices  # noqa: E402
+from agendaindex.section_taxonomy import public_section_indices  # noqa: E402
 
 
 def indices_by_type(stages: list) -> tuple[set[int], set[int]]:

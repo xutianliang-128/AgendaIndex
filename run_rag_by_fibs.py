@@ -51,7 +51,7 @@ DEFAULT_YEAR_END = 2026
 def _indices_in_stage(stages: list, stage_name: str) -> list:
     """Indices across ALL stages matching stage_name (repeated/aliased public windows)."""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from pageindex.section_taxonomy import indices_for_section
+    from agendaindex.section_taxonomy import indices_for_section
 
     return indices_for_section(stages, stage_name)
 
@@ -96,7 +96,7 @@ def run_predictions(
 
     Returns (all_results, metrics_by_section).
     """
-    from pageindex.meeting_structure import classify_utterance_public_remark
+    from agendaindex.meeting_structure import classify_utterance_public_remark
 
     jobs = []
     sections_found = set()
@@ -354,7 +354,7 @@ def main() -> None:
     if args.year_range:
         args.year_start, args.year_end = args.year_range
 
-    from pageindex.transcript_loader import (
+    from agendaindex.transcript_loader import (
         discover_transcript_files,
         format_fibs_for_key,
         load_meetings_for_fibs_year,
@@ -419,7 +419,7 @@ def main() -> None:
     print(f"  Saved meeting JSON -> {meeting_path}")
 
     structure_path = os.path.join(args.results_dir, f"{tag}_meeting_structure.json")
-    from pageindex.meeting_structure import extract_public_comment_by_section
+    from agendaindex.meeting_structure import extract_public_comment_by_section
 
     structure, _structure_source = _resolve_structure(
         skip_structure=args.skip_structure,

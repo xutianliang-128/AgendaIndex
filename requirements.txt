@@ -7,7 +7,7 @@ python-dotenv>=1.0.0
 PyYAML>=6.0
 
 # Only needed for PDF/document utilities used by the legacy tree path
-# (pageindex/page_index.py). Safe to omit for meeting-JSON inference.
+# (agendaindex/page_index.py). Safe to omit for meeting-JSON inference.
 PyPDF2>=3.0.0
 pymupdf>=1.23.0
 
