@@ -1,0 +1,17 @@
+# AgendaIndex — core inference dependencies
+# Python 3.10+ recommended
+
+openai>=1.0.0
+tiktoken>=0.5.0
+python-dotenv>=1.0.0
+PyYAML>=6.0
+
+# Only needed for PDF/document utilities used by the legacy tree path
+# (pageindex/page_index.py). Safe to omit for meeting-JSON inference.
+PyPDF2>=3.0.0
+pymupdf>=1.23.0
+
+# Optional: local Qwen backend (LLM_BACKEND=qwen)
+# torch>=2.4.0
+# transformers>=4.51.0
+# outlines>=0.1.0
