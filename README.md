@@ -45,6 +45,33 @@ Production entry points still expose the simpler per-utterance classifier in `ag
 
 ---
 
+## Results (IC2S2 ten-city gold set)
+
+Binary public-comment F1 per city, on the annotated 2023 test meetings.
+
+| Model | SEA | OAK | RCH | AA | LS | RO | JS | AP | PE | IN | Avg |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| GPT-4o (whole transcript) | 0.638 | 0.117 | 0.857 | 0.515 | 0.000 | 0.629 | 0.348 | 0.333 | 0.000 | 0.254 | 0.369 |
+| RoBERTa (fine-tuned) | 0.929 | 0.717 | 0.000 | 0.642 | 0.587 | 0.811 | 0.723 | 0.222 | 0.000 | 0.247 | 0.488 |
+| PublicSpeak | 0.929 | 0.785 | **1.000** | 0.894 | 0.612 | 0.811 | 0.870 | 0.222 | 0.247 | 0.000 | 0.637 |
+| AgendaIndex (IC2S2 paper) | 0.920 | **0.866** | 0.857 | **0.978** | **0.731** | 0.911 | 0.941 | 0.889 | **0.862** | 0.345 | 0.830 |
+| AgendaIndex (`gpt-4.1-mini` Stage 2) † | 0.967 | 0.759 | **1.000** | 0.918 | 0.647 | 0.912 | **0.987** | 0.842 | 0.840 | 0.510 | 0.838 |
+| **AgendaIndex-SFT (Qwen3-4B LoRA Stage 2)** † | **1.000** | 0.853 | **1.000** | 0.930 | 0.643 | **0.957** | **0.987** | **1.000** | 0.763 | **0.535** | **0.867** |
+
+The first four rows are from the IC2S2 extended abstract (Table 1). Rows marked † are produced by this repository on the test split (34 meetings, 2–4 per city), scored end-to-end over the whole meeting so utterances outside a predicted window count as misses. Both † rows use the same Stage 1 structures and heading-based windows and differ only in the Stage 2 classifier; per-city numbers rest on a handful of meetings and move by a few points between runs.
+
+Pooled over the ten cities (precision / recall / F1, threshold 0.5):
+
+| Stage 2 classifier | Public Comment | Public Hearing |
+|---|---|---|
+| Qwen3-4B zero-shot | 0.627 / 0.727 / 0.673 | 0.623 / 0.656 / 0.639 |
+| `gpt-4.1-mini`, per-line batch | 0.754 / 0.816 / 0.784 | 0.831 / 0.674 / 0.745 |
+| **Qwen3-4B + LoRA (SFT)** | 0.784 / 0.846 / **0.814** | 0.932 / 0.646 / **0.763** |
+
+Fine-tuning mainly buys precision: the model learns to label staff presentations and council deliberation inside a hearing as 0. Hearing recall is capped by Stage 1, and Lansing hearing F1 is 0 in both † rows because Lansing holds its hearings under a "Public Comment" heading; `--window-typing auto` in `scripts/infer_ic2s2_best.py` fixes that and is not yet combined with the SFT classifier. The SFT model is trained on meetings from the same 37 cities as the test split, so these numbers do not measure transfer to unseen cities.
+
+---
+
 ## Repository layout
 
 ```
@@ -70,6 +97,14 @@ AgendaIndex/
 │   ├── ab_classifier_models.py     # Model × prompt A/B
 │   ├── run_year_all_cities.py      # Resumable multi-city year driver
 │   └── export_inferred_pc_ph.py    # Export predicted PC/PH utterances
+├── sft/                            # Stage 2 as a fine-tuned Qwen3-4B (LoRA)
+│   ├── build_windows.py            # Per-utterance records inside predicted windows
+│   ├── prompt.py                   # Classifier prompt (answer 1 / 0)
+│   ├── train_lora.py               # LoRA training (torchrun, multi-GPU)
+│   ├── score.py                    # p("1") scoring, base or +adapter
+│   ├── gpt_baseline.py             # gpt-4.1-mini on the same windows
+│   ├── evaluate.py                 # End-to-end / within-window, per city
+│   └── run_scoring.sh
 ├── docs/section_name_by_city.md    # Observed PC/PH stage-name aliases
 └── requirements.txt
 ```
@@ -153,6 +188,26 @@ python run_rag_by_fibs.py \
 ### 4. Best-config IC2S2-style scoring
 
 `scripts/infer_ic2s2_best.py` runs the winning batch classifier (C + per-line + chunk 100 + `gpt-4.1-mini` + v2 rules) and optional content-based window typing (`--window-typing auto`). Point it at your annotated split directory and structure cache (see script docstring).
+
+### 5. Stage 2 with a fine-tuned Qwen3-4B
+
+Replaces the API classifier with a local LoRA model. Training labels are "spoken by a member of the public" (PC or PH gold) for every utterance inside a predicted window; the window decides PC vs PH.
+
+```bash
+python sft/build_windows.py --splits-dir DATA/all_splits \
+  --structure-dir CACHE/structures --out-dir results/sft_data
+
+torchrun --nproc_per_node 3 sft/train_lora.py \
+  --data-dir results/sft_data --output-dir results/sft_qwen4b
+
+torchrun --nproc_per_node 3 sft/score.py --data results/sft_data/test.jsonl \
+  --adapter results/sft_qwen4b/adapter --out results/sft_eval/qwen_sft_test.json
+
+python sft/evaluate.py --data-dir results/sft_data \
+  --system qwen_sft=results/sft_eval/qwen_sft_test.json --out results/sft_eval/report.json
+```
+
+Defaults: LoRA r=16, alpha=32 on all attention and MLP projections, 2 epochs, lr 2e-4, effective batch 24, about an hour on 3× A6000. Scoring the test split takes about two minutes.
 
 ---
 
